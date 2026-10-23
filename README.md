@@ -286,9 +286,9 @@ php artisan test tests/Feature/ItemTest.php
 
 The ER diagram is in `docs/er-diagram/`.
 
-- `categories` 1 → N `items`
-- `users` 1 → N `personal_access_tokens` (Sanctum)
-- `customers` is a standalone table
+- `category` 1 → M `item`
+- `user` is a standalone table
+- `customer` is a standalone table
 - A user's role (`owner`, `manager`, `cashier`) is stored in `users.role`
 
 ## Project structure
