@@ -1,58 +1,320 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Ice Cream Shop API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A RESTful backend for an ice cream shop, built with **Laravel 13** and **MySQL**. It manages inventory items (grouped by flavor/category) and customer records, with token authentication and role-based access control for three roles: Owner, Manager and Cashier.
 
-## About Laravel
+**Author:** Suranga Prabash  
+**Repository:** https://github.com/surangaprabash/ice-cream-shop-laravel
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Token authentication with Laravel Sanctum (login, logout, current user)
+- Role-based access control enforced on the backend (Owner, Manager, Cashier)
+- Inventory item CRUD with search by name and pagination
+- Customer CRUD with pagination
+- Read-only category (flavor) listing
+- Input validation with clear JSON error responses
+- Login rate limiting (5 attempts per minute) and token expiry
+- Migrations, seeders and automated feature tests
+- Postman collection and environment included
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Tech stack
 
-## Learning Laravel
+- PHP 8.3 or higher
+- Laravel 13
+- MySQL 8
+- Laravel Sanctum
+- PHPUnit (tests run on in-memory SQLite)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Getting started
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Requirements
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- PHP 8.3+ with the `pdo_mysql` and `pdo_sqlite` extensions
+- Composer
+- MySQL
 
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 1. Clone the repository
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/surangaprabash/ice-cream-shop-laravel.git
+cd ice-cream-shop-laravel
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Install dependencies
 
-## Contributing
+```bash
+composer install
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 3. Configure the environment
 
-## Code of Conduct
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+On Windows PowerShell, use `copy .env.example .env` instead of `cp`.
 
-## Security Vulnerabilities
+### 4. Create the database
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Run this in MySQL (console, phpMyAdmin, Laragon or XAMPP):
 
-## License
+```sql
+CREATE DATABASE icecream_shop CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Open `.env` and set your MySQL credentials:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=icecream_shop
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 5. Run migrations and seeders
+
+```bash
+php artisan migrate --seed
+```
+
+### 6. Start the server
+
+```bash
+php artisan serve
+```
+
+The API is now available at `http://127.0.0.1:8000/api`.
+
+## Seed data
+
+`php artisan migrate --seed` creates:
+
+**Users** (password for all: `password123`)
+
+| Role | Email |
+|---|---|
+| Owner | owner@icecream.test |
+| Manager | manager@icecream.test |
+| Cashier | cashier@icecream.test |
+
+**Categories (6):** Chocolate, Vanilla, Strawberry, Fruit and Nuts, Rocky Road, Cookies and Cream  
+**Items:** 18 (3 per category)  
+**Customers:** 5
+
+To reset everything to the seed data:
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+> These accounts are for development only. Change the passwords for any real deployment.
+
+## Role permissions
+
+| Action | Owner | Manager | Cashier |
+|---|:---:|:---:|:---:|
+| View items | ✅ | ✅ | ✅ |
+| Create items | ✅ | ✅ | ❌ |
+| Update items | ✅ | ✅ | ✅ |
+| Delete items | ✅ | ❌ | ❌ |
+| View customers | ✅ | ✅ | ✅ |
+| Create customers | ✅ | ✅ | ✅ |
+| Update customers | ✅ | ✅ | ✅ |
+| Delete customers | ✅ | ❌ | ❌ |
+
+Permissions are enforced by the `role` middleware on each route (see `routes/api.php`). A forbidden action returns `403`.
+
+## API reference
+
+Send `Accept: application/json` on every request. Protected endpoints also need the header `Authorization: Bearer <token>`.
+
+| Method | Endpoint | Description | Allowed roles |
+|---|---|---|---|
+| POST | `/api/auth/login` | Log in and get a token | Public |
+| POST | `/api/auth/logout` | Revoke the current token | Any logged-in user |
+| GET | `/api/auth/me` | Current user | Any logged-in user |
+| GET | `/api/categories` | List categories | Any logged-in user |
+| GET | `/api/items` | List items (`?search=`, `?page=`, `?per_page=`) | All |
+| GET | `/api/items/{id}` | Get an item | All |
+| POST | `/api/items` | Create an item | Owner, Manager |
+| PUT/PATCH | `/api/items/{id}` | Update an item | All |
+| DELETE | `/api/items/{id}` | Delete an item | Owner |
+| GET | `/api/customers` | List customers (`?page=`, `?per_page=`) | All |
+| GET | `/api/customers/{id}` | Get a customer | All |
+| POST | `/api/customers` | Create a customer | All |
+| PUT/PATCH | `/api/customers/{id}` | Update a customer | All |
+| DELETE | `/api/customers/{id}` | Delete a customer | Owner |
+
+Lists are paginated, 10 per page by default (`per_page` up to 50).
+
+### Example: login
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{ "email": "owner@icecream.test", "password": "password123" }
+```
+
+Response `200`:
+
+```json
+{
+  "message": "Login successful.",
+  "token_type": "Bearer",
+  "access_token": "1|xxxxxxxx",
+  "user": { "id": 1, "name": "Shop Owner", "email": "owner@icecream.test", "role": "owner" }
+}
+```
+
+### Example: create an item
+
+```http
+POST /api/items
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "category_id": 1,
+  "name": "Choco Chip Cone",
+  "description": "Chocolate chip single scoop",
+  "price": 360.00,
+  "quantity": 40,
+  "unit": "cone"
+}
+```
+
+### Example: create a customer
+
+```http
+POST /api/customers
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "name": "Test Customer",
+  "email": "test.customer@example.com",
+  "phone": "0771112222",
+  "address": "1 Test Road, Colombo"
+}
+```
+
+### Validation rules
+
+**Item**
+
+| Field | Rule |
+|---|---|
+| `category_id` | required, must exist |
+| `name` | required, max 255, unique within the category |
+| `description` | optional, max 1000 |
+| `price` | required, 0 to 999999.99 |
+| `quantity` | required, whole number, 0 or more |
+| `unit` | optional, max 30 (default `tub`) |
+
+**Customer**
+
+| Field | Rule |
+|---|---|
+| `name` | required, max 255 |
+| `email` | optional, valid email, unique |
+| `phone` | optional, digits with `+ - ( )` and spaces, 7 to 30 characters |
+| `address` | optional, max 500 |
+
+On update (PUT or PATCH) every field is optional, so you can send only the fields that changed.
+
+### Response codes
+
+| Code | Meaning |
+|---|---|
+| 200 | Success |
+| 201 | Created |
+| 401 | Missing, invalid or expired token, or wrong credentials |
+| 403 | Your role is not allowed to perform this action |
+| 404 | Record not found |
+| 422 | Validation failed |
+| 429 | Too many login attempts |
+
+## Testing the API with Postman
+
+The collection and environment are in `docs/postman/`:
+
+- `ice-cream-shop.postman_collection.json`
+- `ice-cream-shop.local.postman_environment.json`
+
+### Import
+
+1. Open Postman and click **Import**.
+2. Drag in both JSON files (or choose them with **Files**) and click **Import**.
+3. In the top-right environment dropdown, select **Ice Cream Shop - Local**.
+4. Check that the `baseurl` variable is `http://127.0.0.1:8000` (edit it if your server uses another address).
+
+### Use
+
+1. Make sure the server is running (`php artisan serve`).
+2. In the **Auth** folder, run **Login - Owner**, **Login - Manager** or **Login - Cashier**. The token is saved automatically to the `token` environment variable.
+3. Run any request in the **Categories**, **Items** or **Customers** folders. They use the saved token automatically.
+4. To test another role's permissions, run that role's login request first, then repeat the request. For example, log in as Cashier and run **Create item** to see the `403` response.
+
+**Note:** when sending a body with POST, PUT or PATCH, set it to **raw → JSON** in the Body tab.
+
+## Running the automated tests
+
+```bash
+php artisan test
+```
+
+The tests are HTTP feature tests covering:
+
+- Login, logout, invalid credentials and login rate limiting
+- The full role permission matrix for items and customers
+- CRUD operations, search and pagination
+- Validation rules and 404 handling
+
+They run on an in-memory SQLite database, so your MySQL data is never touched.
+
+To run a single test file:
+
+```bash
+php artisan test tests/Feature/ItemTest.php
+```
+
+## Database design
+
+The ER diagram is in `docs/er-diagram/`.
+
+- `categories` 1 → N `items`
+- `users` 1 → N `personal_access_tokens` (Sanctum)
+- `customers` is a standalone table
+- A user's role (`owner`, `manager`, `cashier`) is stored in `users.role`
+
+## Project structure
+
+```
+app/
+  Enums/Role.php                      Role enum (owner, manager, cashier)
+  Http/Controllers/Api/               Auth, Item, Customer and Category controllers
+  Http/Middleware/EnsureUserHasRole   Role-based access middleware
+  Http/Requests/                      Validation (form requests)
+  Http/Resources/                     JSON response formatting
+  Models/                             User, Category, Item, Customer
+database/
+  migrations/  seeders/  factories/
+docs/
+  postman/  er-diagram/
+routes/api.php                        All API routes and role rules
+tests/Feature/                        Feature tests
+```
+
+## Notes
+
+- Authentication uses Laravel Sanctum bearer tokens. Tokens expire after 480 minutes (`SANCTUM_EXPIRATION` in `.env`).
+- A category that still has items cannot be deleted (foreign key RESTRICT).
+
+## Author
+
+Developed by **Suranga Prabash**  
+GitHub: [surangaprabash](https://github.com/surangaprabash)
