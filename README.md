@@ -142,7 +142,7 @@ Send `Accept: application/json` on every request. Protected endpoints also need 
 | POST | `/api/items` | Create an item | Owner, Manager |
 | PUT/PATCH | `/api/items/{id}` | Update an item | All |
 | DELETE | `/api/items/{id}` | Delete an item | Owner |
-| GET | `/api/customers` | List customers (`?page=`, `?per_page=`) | All |
+| GET | `/api/customers` | List customers | All |
 | GET | `/api/customers/{id}` | Get a customer | All |
 | POST | `/api/customers` | Create a customer | All |
 | PUT/PATCH | `/api/customers/{id}` | Update a customer | All |
