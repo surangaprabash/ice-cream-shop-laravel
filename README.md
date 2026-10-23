@@ -1,4 +1,4 @@
-# Ice Cream Shop API
+# Ice Cream Shop Backend
 
 A RESTful backend for an ice cream shop, built with **Laravel 13** and **MySQL**. It manages inventory items (grouped by flavor/category) and customer records, with token authentication and role-based access control for three roles: Owner, Manager and Cashier.
 
